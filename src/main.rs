@@ -8,6 +8,7 @@ use rayon::{
     prelude::{IntoParallelIterator, ParallelIterator},
     ThreadPoolBuilder,
 };
+use std::time::Instant;
 
 fn main() {
     let args = Cli::parse();
@@ -92,6 +93,12 @@ fn main() {
 
     let mut image = RgbaImage::new(width, height);
 
+    if !args.no_info {
+        println!("Starting generation with seed {}...",  fastrand::get_seed());
+    }
+
+    let timer = Instant::now();
+
     if let Some(threads) = args.threads {
         let pool = ThreadPoolBuilder::new()
             .num_threads(threads)
@@ -109,7 +116,15 @@ fn main() {
         }
     }
 
+    if !args.no_info {
+        println!("Finished generation in {:?}!\nSaving image...", timer.elapsed());
+    }
+
     image
         .save_with_format(args.file_name, ImageFormat::Png)
         .unwrap();
+
+    if !args.no_info {
+        println!("Done!");
+    }
 }

@@ -34,6 +34,9 @@ pub struct Cli {
 
     #[arg(long, short, default_value = "out.png")]
     pub file_name: String,
+
+    #[arg(long, short)]
+    pub no_info: bool
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
