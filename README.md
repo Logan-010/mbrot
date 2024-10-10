@@ -4,8 +4,8 @@ Generates a random and configurable mandelbrot fractal (png) image.
 
 # Demos
 ![demo 1](demos/demo-1.png)
-![demo 2](demos/demo-1.png)
-![demo 3](demos/demo-1.png)
+![demo 2](demos/demo-2.png)
+![demo 3](demos/demo-3.png)
 
 # Running
 Download a release from [here](https://github.com/Logan-010/mbrot/releases/latest)
