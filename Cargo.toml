@@ -1,0 +1,19 @@
+[package]
+name = "mbrot"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.5.20", features = ["derive"] }
+fastrand = "2.1.1"
+image = { version = "0.25.2", default-features = false, features = ["png"] }
+rayon = { version = "1.10.0", default-features = false }
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+opt-level = "z"
+panic = "abort"
+strip = "symbols"
+incremental = false
+debug = false
