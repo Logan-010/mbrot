@@ -23,6 +23,8 @@ fn main() {
         fastrand::seed(seed)
     }
 
+    let seed = fastrand::get_seed();
+
     let (width, height) = (args.dimensions[0], args.dimensions[1]);
 
     let palette = if let Some(ref colormap) = args.colormap {
@@ -94,7 +96,7 @@ fn main() {
     let mut image = RgbaImage::new(width, height);
 
     if !args.no_info {
-        println!("Starting generation with seed {}...",  fastrand::get_seed());
+        println!("Starting generation with seed {}...",  seed);
     }
 
     let timer = Instant::now();
