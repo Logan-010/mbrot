@@ -17,7 +17,7 @@ pub struct Cli {
     #[arg(long, short, num_args = 2)]
     pub view_size: Option<Vec<u32>>,
 
-    #[arg(long, short, num_args = 2, default_values_t = [128, 2048])]
+    #[arg(long, short, num_args = 2, default_values_t = [super::MIN_STEPS, super::MAX_STEPS])]
     pub step_limits: Vec<u32>,
 
     #[arg(long, short)]
@@ -29,14 +29,14 @@ pub struct Cli {
     #[arg(long, short)]
     pub threads: Option<usize>,
 
-    #[arg(long, short, default_value_t = 4.0)]
+    #[arg(long, short, default_value_t = super::BAILOUT_NUM)]
     pub bailout_num: f64,
 
     #[arg(long, short, default_value = "out.png")]
     pub file_name: String,
 
     #[arg(long, short)]
-    pub no_info: bool
+    pub no_info: bool,
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]

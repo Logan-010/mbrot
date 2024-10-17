@@ -16,7 +16,7 @@ fn main() {
     let cfg = MandelbrotConfig {
         min_steps: args.step_limits[0],
         max_steps: args.step_limits[1],
-        bailout_num: args.bailout_num,
+        bailout_num: 1.0 * 10.0f64.powf(args.bailout_num),
     };
 
     if let Some(seed) = args.rng_seed {
@@ -37,6 +37,10 @@ fn main() {
 
     let steps;
 
+    if let Some(seed) = args.rng_seed {
+        fastrand::seed(seed)
+    }
+
     let center = match args.image_center {
         Some(v) => {
             let point = (v[0], v[1]);
@@ -49,6 +53,10 @@ fn main() {
             (x, y)
         }
     };
+
+    if let Some(seed) = args.rng_seed {
+        fastrand::seed(seed)
+    }
 
     let dx;
     let dy;
@@ -96,7 +104,7 @@ fn main() {
     let mut image = RgbaImage::new(width, height);
 
     if !args.no_info {
-        println!("Starting generation with seed {}...",  seed);
+        println!("Starting generation with seed {}...", seed);
     }
 
     let timer = Instant::now();
@@ -119,7 +127,10 @@ fn main() {
     }
 
     if !args.no_info {
-        println!("Finished generation in {:?}!\nSaving image...", timer.elapsed());
+        println!(
+            "Finished generation in {:?}!\nSaving image...",
+            timer.elapsed()
+        );
     }
 
     image
