@@ -19,11 +19,9 @@ fn main() {
         bailout_num: 1.0 * 10.0f64.powf(args.bailout_num),
     };
 
-    if let Some(seed) = args.rng_seed {
-        fastrand::seed(seed)
-    }
+    let seed = args.rng_seed.unwrap_or_else(|| fastrand::get_seed());
 
-    let seed = fastrand::get_seed();
+    fastrand::seed(seed);
 
     let (width, height) = (args.dimensions[0], args.dimensions[1]);
 
@@ -37,9 +35,7 @@ fn main() {
 
     let steps;
 
-    if let Some(seed) = args.rng_seed {
-        fastrand::seed(seed)
-    }
+    fastrand::seed(seed);
 
     let center = match args.image_center {
         Some(v) => {
@@ -54,9 +50,8 @@ fn main() {
         }
     };
 
-    if let Some(seed) = args.rng_seed {
-        fastrand::seed(seed)
-    }
+    fastrand::seed(seed);
+    
 
     let dx;
     let dy;
