@@ -7,6 +7,7 @@ edition = "2021"
 clap = { version = "4.5.20", features = ["derive"] }
 fastrand = "2.1.1"
 image = { version = "0.25.2", default-features = false, features = ["png"] }
+num = "0.4.3"
 rayon = { version = "1.10.0", default-features = false }
 
 [profile.release]
