@@ -51,14 +51,13 @@ fn main() {
     };
 
     fastrand::seed(seed);
-    
 
     let dx;
     let dy;
 
     if let Some(size) = args.view_size {
-        dx = (size[0] / 2) as f64;
-        dy = (size[1] / 2) as f64;
+        dx = size[0] / 2.0;
+        dy = size[1] / 2.0;
     } else {
         dx = (steps as f64).powf(rand_range(-2.5, -1.0));
         dy = dx * height as f64 / width as f64;

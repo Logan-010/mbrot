@@ -11,11 +11,11 @@ pub struct Cli {
     #[arg(long, short, num_args = 2, default_values_t = [1920, 1080])]
     pub dimensions: Vec<u32>,
 
-    #[arg(long, short, num_args = 2)]
+    #[arg(long, short, num_args = 2, allow_hyphen_values = true)]
     pub image_center: Option<Vec<f64>>,
 
     #[arg(long, short, num_args = 2)]
-    pub view_size: Option<Vec<u32>>,
+    pub view_size: Option<Vec<f64>>,
 
     #[arg(long, short, num_args = 2, default_values_t = [super::MIN_STEPS, super::MAX_STEPS])]
     pub step_limits: Vec<u32>,
