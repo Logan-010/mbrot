@@ -19,7 +19,7 @@ fn main() {
         bailout_num: 1.0 * 10.0f64.powf(args.bailout_num),
     };
 
-    let seed = args.rng_seed.unwrap_or_else(|| fastrand::get_seed());
+    let seed = args.rng_seed.unwrap_or_else(fastrand::get_seed);
 
     fastrand::seed(seed);
 
