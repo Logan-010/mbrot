@@ -1,40 +1,49 @@
 use clap::{Parser, ValueEnum};
-
 use crate::colormaps;
 
 #[derive(Parser)]
-#[command(name = "mbrot")]
-#[command(version = "1.0")]
-#[command(author = "seedse")]
-#[command(about = "A program to generate random and customizable mandelbrot fractals.")]
+#[command(name = env!("CARGO_PKG_NAME"))]
+#[command(version = env!("CARGO_PKG_VERSION"))]
+#[command(author = env!("CARGO_PKG_AUTHORS"))]
+#[command(about = env!("CARGO_PKG_DESCRIPTION"))]
 pub struct Cli {
+    /// Dimensions for the output image
     #[arg(long, short, num_args = 2, default_values_t = [1920, 1080])]
     pub dimensions: Vec<u32>,
 
+    /// Cords for the image center
     #[arg(long, short, num_args = 2, allow_hyphen_values = true)]
     pub image_center: Option<Vec<f64>>,
 
+    /// View size for the image
     #[arg(long, short, num_args = 2)]
     pub view_size: Option<Vec<f64>>,
 
+    /// Step limits for generation
     #[arg(long, short, num_args = 2, default_values_t = [super::MIN_STEPS, super::MAX_STEPS])]
     pub step_limits: Vec<u32>,
 
+    /// Colormap to color output image with
     #[arg(long, short)]
     pub colormap: Option<Colormap>,
 
+    /// Rng seed
     #[arg(long, short)]
     pub rng_seed: Option<u64>,
 
+    /// Number of threads to use
     #[arg(long, short)]
     pub threads: Option<usize>,
 
+    /// Bailout number for generation
     #[arg(long, short, default_value_t = super::BAILOUT_NUM)]
     pub bailout_num: f64,
 
+    /// Output file name
     #[arg(long, short, default_value = "out.png")]
     pub file_name: String,
 
+    /// No output
     #[arg(long, short)]
     pub no_info: bool,
 }

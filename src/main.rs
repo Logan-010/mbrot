@@ -1,11 +1,11 @@
 use clap::Parser;
-use image::{ImageFormat, Rgba, RgbaImage};
+use image::RgbaImage;
 use mbrot::{
     args::{Cli, COLORMAP_CHOICES},
     choose_center, lerp, mandelbrot, rand_range, MandelbrotConfig,
 };
 use rayon::{
-    prelude::{IntoParallelIterator, ParallelIterator},
+    iter::IndexedParallelIterator, prelude::ParallelIterator, slice::ParallelSliceMut,
     ThreadPoolBuilder,
 };
 use std::time::Instant;
@@ -66,40 +66,11 @@ fn main() {
     let (xmin, xmax) = (center.0 - dx, center.0 + dx);
     let (ymin, ymax) = (center.1 - dy, center.1 + dy);
 
-    let points = || {
-        (0..height)
-            .into_par_iter()
-            .flat_map(|y| {
-                let mut temp = Vec::new();
-
-                for x in 0..width {
-                    temp.push((x as f64, y as f64));
-                }
-
-                temp
-            })
-            .map(|point| {
-                let scaled = (
-                    lerp(xmin, xmax, point.0 / (width as f64 - 1.0)),
-                    lerp(ymin, ymax, point.1 / (height as f64 - 1.0)),
-                );
-
-                let iteration = mandelbrot(scaled, &cfg);
-
-                let index = (3 * iteration as usize).clamp(0, palette.len() - 3);
-
-                let sample = &palette[index..];
-
-                (point, Rgba::from([sample[0], sample[1], sample[2], 0xFF]))
-            })
-            .collect::<Vec<((f64, f64), Rgba<u8>)>>()
-    };
-
-    let mut image = RgbaImage::new(width, height);
-
     if !args.no_info {
         println!("Starting generation with seed {}...", seed);
     }
+
+    let mut image = RgbaImage::new(width, height);
 
     let timer = Instant::now();
 
@@ -110,14 +81,46 @@ fn main() {
             .unwrap();
 
         pool.install(|| {
-            for (point, color) in points() {
-                image.put_pixel(point.0 as u32, point.1 as u32, color);
-            }
+            image
+                .par_chunks_mut(width as usize * 4)
+                .enumerate()
+                .for_each(|(y, row)| {
+                    for x in 0..width {
+                        let xf = x as f64 / (width as f64 - 1.0);
+                        let yf = y as f64 / (height as f64 - 1.0);
+
+                        let scaled = (lerp(xmin, xmax, xf), lerp(ymin, ymax, yf));
+
+                        let iteration = mandelbrot(scaled, &cfg);
+                        let idx = (3 * iteration as usize).clamp(0, palette.len() - 3);
+
+                        let px = &palette[idx..idx + 3];
+
+                        let offset = (x as usize) * 4;
+                        row[offset..offset + 4].copy_from_slice(&[px[0], px[1], px[2], 0xFF]);
+                    }
+                });
         });
     } else {
-        for (point, color) in points() {
-            image.put_pixel(point.0 as u32, point.1 as u32, color);
-        }
+        image
+            .par_chunks_mut(width as usize * 4)
+            .enumerate()
+            .for_each(|(y, row)| {
+                for x in 0..width {
+                    let xf = x as f64 / (width as f64 - 1.0);
+                    let yf = y as f64 / (height as f64 - 1.0);
+
+                    let scaled = (lerp(xmin, xmax, xf), lerp(ymin, ymax, yf));
+
+                    let iteration = mandelbrot(scaled, &cfg);
+                    let idx = (3 * iteration as usize).clamp(0, palette.len() - 3);
+
+                    let px = &palette[idx..idx + 3];
+
+                    let offset = (x as usize) * 4;
+                    row[offset..offset + 4].copy_from_slice(&[px[0], px[1], px[2], 0xFF]);
+                }
+            });
     }
 
     if !args.no_info {
@@ -127,9 +130,7 @@ fn main() {
         );
     }
 
-    image
-        .save_with_format(args.file_name, ImageFormat::Png)
-        .unwrap();
+    image.save(args.file_name).expect("Failed to save image");
 
     if !args.no_info {
         println!("Done!");
