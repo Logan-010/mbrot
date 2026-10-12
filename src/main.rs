@@ -1,12 +1,13 @@
 use clap::Parser;
-use image::RgbaImage;
+use image::RgbImage;
 use mbrot::{
-    args::{Cli, COLORMAP_CHOICES},
-    choose_center, lerp, mandelbrot, rand_range, MandelbrotConfig,
+    MandelbrotConfig,
+    args::{COLORMAP_CHOICES, Cli},
+    choose_center, lerp, mandelbrot, rand_range,
 };
 use rayon::{
-    iter::IndexedParallelIterator, prelude::ParallelIterator, slice::ParallelSliceMut,
-    ThreadPoolBuilder,
+    ThreadPoolBuilder, iter::IndexedParallelIterator, prelude::ParallelIterator,
+    slice::ParallelSliceMut,
 };
 use std::time::Instant;
 
@@ -33,35 +34,25 @@ fn main() {
         COLORMAP_CHOICES[choice].to_colormap()
     };
 
-    let steps;
-
     fastrand::seed(seed);
 
-    let center = match args.image_center {
+    let (center, steps) = match args.image_center {
         Some(v) => {
             let point = (v[0], v[1]);
-            steps = mandelbrot(point, &cfg);
-            point
+            let steps = mandelbrot(point, &cfg);
+            (point, steps)
         }
-        None => {
-            let (mut x, mut y) = (0.0, 0.0);
-            steps = choose_center(&mut x, &mut y, &cfg);
-            (x, y)
-        }
+        None => choose_center(&cfg),
     };
 
     fastrand::seed(seed);
 
-    let dx;
-    let dy;
-
-    if let Some(size) = args.view_size {
-        dx = size[0] / 2.0;
-        dy = size[1] / 2.0;
+    let (dx, dy) = if let Some(size) = args.view_size {
+        (size[0] / 2.0, size[1] / 2.0)
     } else {
-        dx = (steps as f64).powf(rand_range(-2.5, -1.0));
-        dy = dx * height as f64 / width as f64;
-    }
+        let dx = (steps as f64).powf(rand_range(-2.5, -1.0));
+        (dx, dx * height as f64 / width as f64)
+    };
 
     let (xmin, xmax) = (center.0 - dx, center.0 + dx);
     let (ymin, ymax) = (center.1 - dy, center.1 + dy);
@@ -70,7 +61,7 @@ fn main() {
         println!("Starting generation with seed {}...", seed);
     }
 
-    let mut image = RgbaImage::new(width, height);
+    let mut image = RgbImage::new(width, height);
 
     let timer = Instant::now();
 
@@ -82,7 +73,7 @@ fn main() {
 
         pool.install(|| {
             image
-                .par_chunks_mut(width as usize * 4)
+                .par_chunks_mut(width as usize * 3)
                 .enumerate()
                 .for_each(|(y, row)| {
                     for x in 0..width {
@@ -96,14 +87,14 @@ fn main() {
 
                         let px = &palette[idx..idx + 3];
 
-                        let offset = (x as usize) * 4;
-                        row[offset..offset + 4].copy_from_slice(&[px[0], px[1], px[2], 0xFF]);
+                        let offset = (x as usize) * 3;
+                        row[offset..offset + 3].copy_from_slice(&[px[0], px[1], px[2]]);
                     }
                 });
         });
     } else {
         image
-            .par_chunks_mut(width as usize * 4)
+            .par_chunks_mut(width as usize * 3)
             .enumerate()
             .for_each(|(y, row)| {
                 for x in 0..width {
@@ -117,8 +108,8 @@ fn main() {
 
                     let px = &palette[idx..idx + 3];
 
-                    let offset = (x as usize) * 4;
-                    row[offset..offset + 4].copy_from_slice(&[px[0], px[1], px[2], 0xFF]);
+                    let offset = (x as usize) * 3;
+                    row[offset..offset + 3].copy_from_slice(&[px[0], px[1], px[2]]);
                 }
             });
     }

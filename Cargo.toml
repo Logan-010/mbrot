@@ -1,6 +1,6 @@
 [package]
 name = "mbrot"
-version = "0.2.0"
+version = "0.2.5"
 edition = "2024"
 authors = ["Logan-010"]
 description = "A program to generate random and customizable mandelbrot fractals."
@@ -8,12 +8,12 @@ description = "A program to generate random and customizable mandelbrot fractals
 [dependencies]
 clap = { version = "4.6.0", features = ["derive"] }
 fastrand = "2.4.1"
-image = { version = "0.25.10", default-features = false, features = ["png"] }
+image = { version = "0.25.10", default-features = false, features = ["jpeg"] }
 rayon = { version = "1.11.0", default-features = false }
 
 [profile.release]
-codegen-units = 1
 lto = "fat"
+codegen-units = 1
 panic = "abort"
 strip = true
 debug = false

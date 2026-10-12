@@ -73,12 +73,14 @@ pub fn mandelbrot(input: (f64, f64), cfg: &MandelbrotConfig) -> u32 {
     0
 }
 
-pub fn choose_center(x: &mut f64, y: &mut f64, cfg: &MandelbrotConfig) -> u32 {
+pub fn choose_center(cfg: &MandelbrotConfig) -> ((f64, f64), u32) {
+    let mut x = 0.0;
+    let mut y = 0.0;
     let mut steps = 0;
     while !(cfg.min_steps..cfg.max_steps).contains(&steps) {
-        *x = rand_range(-1.5, 1.0);
-        *y = rand_range(0.0, 1.0);
-        steps = mandelbrot((*x, *y), cfg);
+        x = rand_range(-1.5, 1.0);
+        y = rand_range(0.0, 1.0);
+        steps = mandelbrot((x, y), cfg);
     }
-    steps
+    ((x, y), steps)
 }

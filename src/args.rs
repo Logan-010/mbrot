@@ -1,5 +1,5 @@
-use clap::{Parser, ValueEnum};
 use crate::colormaps;
+use clap::{Parser, ValueEnum};
 
 #[derive(Parser)]
 #[command(name = env!("CARGO_PKG_NAME"))]
@@ -40,7 +40,7 @@ pub struct Cli {
     pub bailout_num: f64,
 
     /// Output file name
-    #[arg(long, short, default_value = "out.png")]
+    #[arg(long, short, default_value = "out.jpg")]
     pub file_name: String,
 
     /// No output
